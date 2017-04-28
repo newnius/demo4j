@@ -1,4 +1,4 @@
-package com.newnius.demo4j.httpclient.charset;
+package com.newnius.demo4j.httpclient.chinese_url;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -7,13 +7,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
-import java.io.*;
-import java.net.*;
+import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.logging.Logger;
 
@@ -101,31 +96,14 @@ public class CRSpider {
 	* Ref: http://justdo2008.iteye.com/blog/463753
 	* */
 	private void parseBody(HttpEntity entity){
+        if(charset==null){
+            charset = "UTF-8";
+        }
 		try {
 			byte[] bytes = EntityUtils.toByteArray(entity);
-			if (charset == null) {
-				Document doc = Jsoup.parse(new String(bytes));
-				Elements metaTags = doc.getElementsByTag("meta");
-				for (Element metaTag : metaTags) {
-					String content = metaTag.attr("content");
-					String http_equiv = metaTag.attr("http-equiv");
-					charset = metaTag.attr("charset");
-					if (!charset.isEmpty()) {
-                        logger.info("Detect charset in meta:"+charset);
-						break;
-					}
-					if (http_equiv.toLowerCase().equals("content-type")) {
-						charset = content.substring(content.toLowerCase().indexOf("charset") + "charset=".length());
-                        logger.info("Detect charset in http-equiv:"+charset);
-						break;
-					}
-				}
-				if (charset == null || charset.isEmpty())
-					charset = "utf-8";
-			}
 			html = new String(bytes, charset);
 		}catch (Exception ex){
-			errMsg = ex.getMessage();
+            errMsg = ex.getClass().getSimpleName()+":"+ex.getMessage();
 		}
 	}
 }
